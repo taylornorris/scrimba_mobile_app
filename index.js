@@ -1,5 +1,5 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-app.js"
-import { getDatabase, ref, push }  from "https://www.gstatic.com/firebasejs/9.15.0/firebase-database.js"
+import { getDatabase, ref, push, onValue }  from "https://www.gstatic.com/firebasejs/9.15.0/firebase-database.js"
 
 const appSettings = {
     databaseURL: "https://realtime-database-86a88-default-rtdb.firebaseio.com/"
@@ -15,10 +15,31 @@ const shoppingListEl = document.getElementById("shopping-list")
 
 addBtnEl.addEventListener("click", function() {
     let inputValue = inputFieldEl.value
-
     push(shoppingListInDb, inputValue)
-
-    inputFieldEl.value = ""
-
-    shoppingListEl.innerHTML += `<li>${inputValue}</li>`
+    clearInput()
 })
+
+onValue(shoppingListInDb, function(snapshot) {
+    let listArray = Object.values(snapshot.val())
+    clearList()
+
+    for (let i = 0; i < listArray.length; i++) {
+        let listItem = listArray[i]
+        addItemToList(listItem)
+
+    }
+
+  
+}) 
+
+function clearInput() {
+    inputFieldEl.value = ""
+}
+
+function clearList() {
+    shoppingListEl.innerHTML = ""
+}
+
+function addItemToList(item) {
+    shoppingListEl.innerHTML += `<li>${item}</li>`
+}
